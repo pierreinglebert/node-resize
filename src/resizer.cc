@@ -6,11 +6,9 @@
 // OpenCV libs
 #include <cv.h>
 #include <opencv2/highgui/highgui.hpp>
-#include "opencv2/ocl/ocl.hpp"
+//#include "opencv2/ocl/ocl.hpp"
 
 #include "nan.h"
-
-#include "tiler.h"
 
 #define DEBUG 0
 #define debug_print(fmt, ...) do { if (DEBUG) fprintf(stderr, "%s:%d:%s(): " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__); } while (0)
@@ -33,7 +31,6 @@ class ResizeWorker : public NanAsyncWorker {
       Mat image = cv::imread(input, CV_LOAD_IMAGE_COLOR);
 
       if (image.empty()){
-        printf("EMPTY %s\n", input.c_str() );
         SetErrorMessage("Error loading file");
         return;
       }
@@ -59,34 +56,11 @@ class ResizeWorker : public NanAsyncWorker {
 
   void HandleOKCallback () {
     NanScope();
-    // Local<Array> tiles = NanNew<Array>(tiledImage->tiles.size());
-    //
-    // for(unsigned int i=0; i < tiledImage->tiles.size(); i++) {
-    //   Local<Object> tile = NanNew<Object>();
-    //   tile->Set(NanNew<v8::String>("x"), NanNew<Number>(tiledImage->tiles[i]->x));
-    //   tile->Set(NanNew<v8::String>("y"), NanNew<Number>(tiledImage->tiles[i]->y));
-    //   tile->Set(NanNew<v8::String>("z"), NanNew<Number>(tiledImage->tiles[i]->z));
-    //   tile->Set(NanNew<v8::String>("width"), NanNew<Number>(tiledImage->tiles[i]->width));
-    //   tile->Set(NanNew<v8::String>("height"), NanNew<Number>(tiledImage->tiles[i]->height));
-    //
-    //   Local<Object> buf = NanNewBufferHandle(tiledImage->tiles[i]->data.size());
-    //   uchar* data = (uchar*) Buffer::Data(buf);
-    //   memcpy(data, &(tiledImage->tiles[i]->data)[0], tiledImage->tiles[i]->data.size());
-    //
-    //   tile->Set(NanNew<String>("buffer"), buf);
-    //   tiles->Set(i, tile);
-    // }
-
-    Local<Object> image = NanNew<Object>();
-    // image->Set(NanNew<String>("width"), NanNew<Number>(tiledImage->width));
-    // image->Set(NanNew<String>("height"), NanNew<Number>(tiledImage->height));
-    // image->Set(NanNew<String>("tiles"), tiles);
 
     Local<Value> argv[] = {
-        NanNull()
-      , image
+     NanNull()
     };
-    callback->Call(2, argv);
+    callback->Call(1, argv);
   }
 
  private:
@@ -104,10 +78,6 @@ NAN_METHOD(ResizeAsync) {
   NanCallback *callback = new NanCallback(args[6].As<Function>());
 
   TryCatch try_catch;
-  printf("start\n");
-
-  // std::string strStrategy(*NanUtf8String(filter_strategies->Get(i)->ToString()));
-
 
   NanAsyncQueueWorker(new ResizeWorker(*NanUtf8String(args[0]), *NanUtf8String(args[1]), args[2]->Uint32Value(), args[3]->Uint32Value(), args[4]->BooleanValue(), args[5]->Uint32Value(), callback));
 
