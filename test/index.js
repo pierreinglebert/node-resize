@@ -1,24 +1,31 @@
-const tiler = require('../index');
-const assert = require('chai').assert;
-const fs = require('fs');
-const path = require('path');
-const async = require('async');
+'use strict';
 
-describe('Stream:', function() {
+var resize = require('..');
+var assert = require('chai').assert;
+var fs = require('fs');
+var path = require('path');
+var async = require('async');
 
-	it('should return tiles & infos for an image', function(done) {
-		tiler(fs.createReadStream('test/fixtures/image.jpg'))
-		.done(function(res) {
-			assert.equal(res.width, 467);
-			assert.equal(res.height, 700);
-			assert.equal(res.tiles.length, 9);
-			done();
-		});
+describe('resize:', function() {
+
+	it.only('should resize an image', function(done) {
+		resize(
+			path.join(__dirname, '..', 'test/fixtures/image.jpg'),
+			path.join(__dirname, '..', 'test.jpg'),
+			{
+				width: 50,
+				height: 50
+			},
+			function(err) {
+				assert.isNull(err);
+				done();
+			}
+		);
 	});
 
 	it('should fail to tile an empty image', function(done) {
 		tiler(fs.createReadStream('test/fixtures/empty.jpg'))
-		.catch(function(err){
+		.catch(function(err) {
 			assert.isNotNull(err);
 		})
 		.done(function(res) {

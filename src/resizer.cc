@@ -47,7 +47,6 @@ class ResizeWorker : public NanAsyncWorker {
         imwrite(output, resized);
     	}
 
-
     } catch(cv::Exception& e) {
       printf("EXCEPTION\n");
       SetErrorMessage("Error loading file");
